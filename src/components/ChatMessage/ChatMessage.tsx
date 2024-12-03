@@ -13,11 +13,13 @@ export default function ChatMessage({ type, content }: ChatMessageProps) {
             type === 'user' ? "flex justify-end" : "flex justify-start"
         )}>
             <div className={cn(
-                "max-w-[80%] rounded-2xl px-4 py-2",
+                "max-w-[80%] rounded-2xl px-4 py-2 shadow-sm",
                 type === 'user'
-                    ? "bg-[#e3e3fd] dark:bg-[#3c4043] text-black dark:text-white"
-                    : "bg-[#f8f9fa] dark:bg-[#2d2d2d] text-black dark:text-white"
-            )}>
+                    ? "bg-[#1a73e8] text-white"
+                    : "bg-[#f8f9fa] dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-200"
+            )}
+                style={{ fontFamily: "'Google Sans', sans-serif" }}
+            >
                 {content}
             </div>
         </div>

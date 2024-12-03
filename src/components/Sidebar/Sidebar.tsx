@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import ChatInput from '../ChatInput/ChatInput.tsx'
 import ChatMessage from '../ChatMessage/ChatMessage.tsx'
 import Menu from '../Menu/Menu.tsx'
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { CardHeader, CardContent } from "@/components/ui/card"
 import { Bot } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
@@ -34,42 +34,50 @@ export default function Sidebar() {
     }
 
     const handleClose = () => {
-        chrome.sidePanel.close();
+        window.close();
     };
 
     return (
         <div className="flex flex-col h-screen bg-white dark:bg-[#1f1f1f]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-[#f8f9fa] dark:bg-[#2d2d2d]">
+            <CardHeader
+                className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-gradient-to-r from-[#1a73e8] to-[#8ab4f8] dark:from-[#1a73e8] dark:to-[#4285f4]"
+                style={{ fontFamily: "'Google Sans', sans-serif" }}
+            >
                 <div className="flex items-center gap-2">
-                    <Bot className="h-6 w-6" />
-                    <h2 className="text-lg font-medium">Chrome Copilot</h2>
+                    <Bot className="h-6 w-6 text-white" />
+                    <h2 className="text-lg font-medium text-white">Chrome Copilot</h2>
                 </div>
-                <Button variant="ghost" size="icon" onClick={handleClose} className="h-8 w-8">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClose}
+                    className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                >
                     ×
                 </Button>
             </CardHeader>
 
             <CardContent className="flex-1 overflow-auto p-0">
                 <div className="h-full">
-                    {showMenu && messages.length === 0 ? (
+                    {showMenu && messages.length === 0 && (
                         <Menu onTaskSelect={handleTaskSelect} />
-                    ) : (
-                        <div className="flex flex-col h-full">
-                            <div className="flex-1 overflow-auto p-4">
-                                {messages.map((msg, index) => (
-                                    <ChatMessage
-                                        key={index}
-                                        type={msg.type}
-                                        content={msg.content}
-                                    />
-                                ))}
-                                <div ref={messagesEndRef} />
-                            </div>
-                            <div className="p-4 border-t">
-                                <ChatInput onSend={handleSend} />
-                            </div>
-                        </div>
                     )}
+                    <div className="flex flex-col h-full">
+                        <div className="flex-1 overflow-auto p-4">
+                            {messages.map((msg, index) => (
+                                <ChatMessage
+                                    key={index}
+                                    type={msg.type}
+                                    content={msg.content}
+                                />
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+                        <div className="p-4 border-t">
+                            <ChatInput onSend={handleSend} />
+                        </div>
+                    </div>
+
                 </div>
             </CardContent>
         </div>
