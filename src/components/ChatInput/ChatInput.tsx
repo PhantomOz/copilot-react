@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Send, Plus } from "lucide-react"
-import TabSelector from '../TabSelector/TabSelector'
+import { Send, Plus, X } from "lucide-react"
+import TabSelector from '../TabSelector/TabSelector.tsx';
+
+interface Tab {
+    id: number;
+    title: string;
+    url: string;
+    favIconUrl?: string;
+}
 
 interface ChatInputProps {
     onSend: (message: string) => void
@@ -11,10 +18,14 @@ interface ChatInputProps {
 export default function ChatInput({ onSend }: ChatInputProps) {
     const [input, setInput] = useState('')
     const [isTabSelectorOpen, setIsTabSelectorOpen] = useState(false)
-    const [selectedTabs, setSelectedTabs] = useState<Array<{ id: number; title: string }>>([])
+    const [selectedTabs, setSelectedTabs] = useState<Tab[]>([])
 
-    const handleTabSelect = (tab: { id: number; title: string }) => {
+    const handleTabSelect = (tab: Tab) => {
         setSelectedTabs(prev => [...prev, tab])
+    }
+
+    const removeTab = (tabId: number) => {
+        setSelectedTabs(prev => prev.filter(tab => tab.id !== tabId))
     }
 
     const handleSubmit = () => {
@@ -25,20 +36,49 @@ export default function ChatInput({ onSend }: ChatInputProps) {
 
     return (
         <div className="flex flex-col gap-2 relative">
-            <div className="flex items-center gap-2">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-[#2d2d2d]"
-                    onClick={() => setIsTabSelectorOpen(true)}
-                >
-                    <Plus className="h-4 w-4 dark:text-gray-300" />
-                </Button>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {selectedTabs.length > 0
-                        ? `${selectedTabs.length} tab${selectedTabs.length > 1 ? 's' : ''} added as context`
-                        : 'Add current tab as context'
-                    }
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 rounded-full hover:bg-gray-100 dark:hover:bg-[#2d2d2d]"
+                            onClick={() => setIsTabSelectorOpen(true)}
+                        >
+                            <Plus className="h-4 w-4 dark:text-gray-300" />
+                        </Button>
+                        {selectedTabs.length === 0 ? (
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Add current tab as context
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 overflow-x-auto">
+                                {selectedTabs.map(tab => (
+                                    <div
+                                        key={tab.id}
+                                        className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-[#2d2d2d] rounded-full text-sm shrink-0"
+                                    >
+                                        <img
+                                            src={tab.favIconUrl || 'default-icon.png'}
+                                            alt=""
+                                            className="w-4 h-4"
+                                        />
+                                        <span className="max-w-[150px] truncate dark:text-gray-200">
+                                            {tab.title}
+                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-4 w-4 p-0 hover:bg-gray-200 dark:hover:bg-[#3d3d3d] rounded-full"
+                                            onClick={() => removeTab(tab.id)}
+                                        >
+                                            <X className="h-3 w-3 dark:text-gray-400" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
