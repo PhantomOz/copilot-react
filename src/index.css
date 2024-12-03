@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    margin-right: 0;
+    transition: margin-right 0.3s ease;
+}
