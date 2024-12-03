@@ -15,6 +15,28 @@ export default function Sidebar() {
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
+        const root = window.document.documentElement;
+        const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const applyTheme = (isDark: boolean) => {
+            if (isDark) {
+                root.classList.add('dark');
+                root.classList.remove('light');
+            } else {
+                root.classList.add('light');
+                root.classList.remove('dark');
+            }
+        };
+
+        applyTheme(darkQuery.matches);
+
+        const handleChange = (e: MediaQueryListEvent) => applyTheme(e.matches);
+        darkQuery.addEventListener('change', handleChange);
+
+        return () => darkQuery.removeEventListener('change', handleChange);
+    }, []);
+
+    useEffect(() => {
         async function initDefaults() {
             if ('ai' in self && 'summarizer' in (self as any).ai) {
                 // The Summarizer API is supported.
@@ -106,9 +128,9 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white dark:bg-[#1f1f1f]">
+        <div className="flex flex-col h-screen bg-white dark:bg-[#0f1117]">
             <CardHeader
-                className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-gradient-to-r from-[#1a73e8] to-[#8ab4f8] dark:from-[#1a73e8] dark:to-[#4285f4]"
+                className="flex flex-row items-center justify-between space-y-0 p-4 border-b bg-gradient-to-r from-[#1a73e8] to-[#8ab4f8] dark:from-[#1f1f1f] dark:to-[#1f1f1f] dark:border-[#2d2d2d]"
                 style={{ fontFamily: "'Google Sans', sans-serif" }}
             >
                 <div className="flex items-center gap-2">
@@ -125,7 +147,7 @@ export default function Sidebar() {
                 </Button>
             </CardHeader>
 
-            <CardContent className="flex-1 overflow-auto p-0">
+            <CardContent className="flex-1 overflow-auto p-0 dark:border-[#2d2d2d]">
                 <div className="h-full">
                     {showMenu && messages.length === 0 && (
                         <Menu onTaskSelect={handleTaskSelect} />
