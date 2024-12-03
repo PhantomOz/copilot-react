@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import ChatInput from '../ChatInput/ChatInput.tsx'
 import ChatMessage from '../ChatMessage/ChatMessage.tsx'
 import Menu from '../Menu/Menu.tsx'
@@ -6,10 +6,53 @@ import { CardHeader, CardContent } from "@/components/ui/card"
 import { Bot } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
+
 export default function Sidebar() {
     const [messages, setMessages] = useState<Array<{ type: 'user' | 'assistant', content: string }>>([])
     const [showMenu, setShowMenu] = useState(true)
+    const [temperature, setTemperature] = useState(3)
+    const [topK, setTopK] = useState(3)
     const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        async function initDefaults() {
+            if ('ai' in self && 'summarizer' in (self as any).ai) {
+                // The Summarizer API is supported.
+                console.log('Summarizer API is supported.');
+                setMessages([{ type: 'assistant', content: 'Summarizer API is supported.' }])
+                const options = {
+                    sharedContext: 'This is a scientific article',
+                    type: 'key-points',
+                    format: 'markdown',
+                    length: 'medium',
+                };
+
+                const available = (await (self as any).ai.summarizer.capabilities()).available;
+                let summarizer;
+                if (available === 'no') {
+                    // The Summarizer API isn't usable.
+                    setMessages([{ type: 'assistant', content: 'Summarizer API isn\'t usable.' }])
+                    summarizer = await (self as any).ai.summarizer.create(options);
+                    return;
+                }
+                if (available === 'readily') {
+                    // The Summarizer API can be used immediately .
+                    summarizer = await (self as any).ai.summarizer.create(options);
+                    setMessages([{ type: 'assistant', content: 'Summarizer API can be used immediately.' }])
+                } else {
+                    // The Summarizer API can be used after the model is downloaded.
+                    summarizer = await (self as any).ai.summarizer.create(options);
+                    summarizer.addEventListener('downloadprogress', (e: any) => {
+                        console.log(e.loaded, e.total);
+                    });
+                    await summarizer.ready;
+                    setMessages([{ type: 'assistant', content: 'Summarizer API can be used after the model is downloaded.' }]);
+                }
+            }
+        }
+
+        initDefaults();
+    }, []);
 
     const handleTaskSelect = (task: string) => {
         setShowMenu(false)
@@ -28,10 +71,35 @@ export default function Sidebar() {
         if (prompt) handleSend(prompt)
     }
 
-    const handleSend = (message: string) => {
-        setMessages(prev => [...prev, { type: 'user', content: message }])
-        // Add your AI response logic here
+
+    async function runPrompt(prompt: string, params: any) {
+        try {
+            let session = await chrome.aiOriginTrial.languageModel.create(params);
+            return session.prompt(prompt);
+        } catch (e) {
+            console.log('Prompt failed');
+            console.error(e);
+            console.log('Prompt:', prompt);
+            // Reset session
+            throw e;
+        }
     }
+
+    const handleSend = async (message: string) => {
+        setMessages(prev => [...prev, { type: 'user', content: message }]);
+
+        try {
+            const params = {
+                systemPrompt: 'You are a helpful and friendly assistant.',
+                temperature: temperature,
+                topK: topK
+            };
+            const response = await runPrompt(message, params);
+            setMessages(prev => [...prev, { type: 'assistant', content: response }]);
+        } catch (e) {
+            setMessages(prev => [...prev, { type: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+        }
+    };
 
     const handleClose = () => {
         window.close();
