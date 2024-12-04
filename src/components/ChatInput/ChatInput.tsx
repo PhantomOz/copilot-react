@@ -22,23 +22,20 @@ export default function ChatInput({ onSend }: ChatInputProps) {
 
     const handleTabSelect = async (tab: Tab) => {
         try {
-            // Activate the tab first
-            await chrome.tabs.update(tab.id, { active: true });
-
-            // Small delay to ensure tab is fully loaded
-            await new Promise(resolve => setTimeout(resolve, 100));
-
             const [result] = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: () => document.body.innerText
             });
 
-            console.log(`Content from tab "${tab.title}":`);
-            console.log(result.result);
+            const tabWithContent = {
+                ...tab,
+                content: result.result
+            };
 
-            setSelectedTabs(prev => [...prev, tab]);
+            setSelectedTabs(prev => [...prev, tabWithContent]);
         } catch (error) {
             console.error(`Failed to get content from tab ${tab.id}:`, error);
+            setSelectedTabs(prev => [...prev, tab]);
         }
     };
 
@@ -54,7 +51,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
                 tabs: selectedTabs.map(tab => ({
                     id: tab.id,
                     title: tab.title,
-                    url: tab.url,
+                    content: (tab as any).content || 'Content not accessible'
                 }))
             }
             : undefined;

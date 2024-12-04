@@ -173,7 +173,7 @@ export default function Sidebar() {
 
             if (context?.tabs.length) {
                 const tabsContext = context.tabs
-                    .map(tab => `[Tab: ${tab.title}]\nURL: ${tab.url}\n`)
+                    .map(tab => `[Tab: ${tab.title}]\nURL: ${tab.url}\nContent: ${tab.content}\n`)
                     .join('\n');
 
                 fullPrompt = `Context:\n${tabsContext}\n\nUser Message: ${message}`;
