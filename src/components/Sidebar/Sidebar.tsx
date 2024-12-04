@@ -100,7 +100,8 @@ export default function Sidebar() {
                     temperature: defaults.defaultTemperature,
                     topK: 3
                 };
-                setLanguageModel(await (self as any).ai.languageModel.create(params));
+                const session = await (self as any).ai.languageModel.create(params);
+                setLanguageModel(session);
             }
         }
 

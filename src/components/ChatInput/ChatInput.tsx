@@ -26,7 +26,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
                 target: { tabId: tab.id },
                 func: () => document.body.innerText
             });
-
+            console.log('Content:', result.result);
             const tabWithContent = {
                 ...tab,
                 content: result.result
