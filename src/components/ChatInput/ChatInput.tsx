@@ -12,7 +12,7 @@ interface Tab {
 }
 
 interface ChatInputProps {
-    onSend: (message: string) => void
+    onSend: (message: string, context?: { tabs: Tab[] }) => void;
 }
 
 export default function ChatInput({ onSend }: ChatInputProps) {
@@ -20,19 +20,48 @@ export default function ChatInput({ onSend }: ChatInputProps) {
     const [isTabSelectorOpen, setIsTabSelectorOpen] = useState(false)
     const [selectedTabs, setSelectedTabs] = useState<Tab[]>([])
 
-    const handleTabSelect = (tab: Tab) => {
-        setSelectedTabs(prev => [...prev, tab])
-    }
+    const handleTabSelect = async (tab: Tab) => {
+        try {
+            // Activate the tab first
+            await chrome.tabs.update(tab.id, { active: true });
+
+            // Small delay to ensure tab is fully loaded
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const [result] = await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: () => document.body.innerText
+            });
+
+            console.log(`Content from tab "${tab.title}":`);
+            console.log(result.result);
+
+            setSelectedTabs(prev => [...prev, tab]);
+        } catch (error) {
+            console.error(`Failed to get content from tab ${tab.id}:`, error);
+        }
+    };
 
     const removeTab = (tabId: number) => {
         setSelectedTabs(prev => prev.filter(tab => tab.id !== tabId))
     }
 
     const handleSubmit = () => {
-        if (!input.trim()) return
-        onSend(input)
-        setInput('')
-    }
+        if (!input.trim()) return;
+
+        const context = selectedTabs.length > 0
+            ? {
+                tabs: selectedTabs.map(tab => ({
+                    id: tab.id,
+                    title: tab.title,
+                    url: tab.url,
+                }))
+            }
+            : undefined;
+
+        onSend(input, context);
+        setInput('');
+    };
 
     return (
         <div className="flex flex-col gap-2 relative">
@@ -52,7 +81,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
                                 Add current tab as context
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2 overflow-x-auto">
+                            <div className="flex items-center gap-2 flex-wrap">
                                 {selectedTabs.map(tab => (
                                     <div
                                         key={tab.id}

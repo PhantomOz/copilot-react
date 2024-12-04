@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,4 +7,42 @@
 body {
     margin-right: 0;
     transition: margin-right 0.3s ease;
+}
+
+
+.markdown-assistant, .markdown-user {
+    @apply prose prose-sm max-w-none;
+    font-family: 'Google Sans', sans-serif;
+}
+
+.markdown-assistant {
+    @apply prose-headings:text-gray-800 prose-headings:dark:text-gray-200
+           prose-p:text-gray-800 prose-p:dark:text-gray-200
+           prose-strong:text-gray-800 prose-strong:dark:text-gray-200
+           prose-ul:text-gray-800 prose-ul:dark:text-gray-200;
+}
+
+
+.markdown-assistant pre, .markdown-user pre {
+    @apply !bg-[#1f1f1f] rounded-lg p-4 my-3;
+}
+
+.markdown-assistant ul,
+.markdown-user ul {
+    @apply my-2 list-disc list-inside;
+}
+
+.markdown-assistant ol,
+.markdown-user ol {
+    @apply my-2 list-decimal list-inside;
+}
+
+.markdown-assistant p,
+.markdown-user p {
+    @apply text-[15px] leading-relaxed;
+}
+
+.markdown-assistant a,
+.markdown-user a {
+    @apply underline;
 }

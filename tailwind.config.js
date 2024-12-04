@@ -51,8 +51,14 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		}
-  	}
+  	},
+  	animation: {
+  		'spin-slow': 'spin 2s linear infinite',
+  	},
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+      require("tailwindcss-animate"),
+      require('@tailwindcss/typography'),
+  ],
 }
 

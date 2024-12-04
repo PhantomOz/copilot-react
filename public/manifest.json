@@ -11,11 +11,12 @@
     "sidePanel",
     "aiLanguageModelOriginTrial"
   ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
   "trial_tokens": [
     "ArKjMGDReaJwhB3stirGMzX0m4aBJrjz63VicMBBUb1KHY6TWt7mTcmpqJjqMaGyZYk4anFs40sse9iq3KRndwEAAABzeyJvcmlnaW4iOiJjaHJvbWUtZXh0ZW5zaW9uOi8vbHBsZGRpbW1tY2tjY2hmcGlub2tub2ZrZGZra2pibGIiLCJmZWF0dXJlIjoiQUlTdW1tYXJpemF0aW9uQVBJIiwiZXhwaXJ5IjoxNzUzMTQyNDAwfQ=="
-  ],
-  "host_permissions": [
-    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
